@@ -88,29 +88,18 @@
         </md-button>
       </div>
     </md-card flex>
-    <!-- FILES -->
-    <div layout="row" layout-align="center center" layout-wrap ng-controller="FileController as files">
-      <md-card>
-        <md-card-title id="addFiles">
-            <md-card-title-text>
-              <span id="cardTitle" class="md-subhead">Add Files</span>
-            </md-card-title-text>
-        </md-card-title>
-        <md-card-content layout="row" layout-wrap>
-          <div ng-include="'/views/templates/new-files.html'"></div>
-        </md-card-content>
-      </md-card flex>
-      <md-card>
-        <md-card-title id="currentFiles">
+    <md-card>
+      <md-card-title id="addFiles">
           <md-card-title-text>
-            <span id="cardTitle" class="md-subhead">Current Files</span>
+            <span id="cardTitle" class="md-subhead">Add Files</span>
           </md-card-title-text>
-        </md-card-title>
+      </md-card-title>
+      <md-card-content>
         <md-card-content layout="row" layout-wrap>
-          <div ng-include="'/views/templates/current-files.html'"></div>
+          <div ng-include="'/views/templates/files.html'"></div>
         </md-card-content>
-      </md-card flex>
-    </div>
+      </md-card-content>
+    </md-card flex>
   </div>
   <div  layout="row" layout-align="center center" layout-wrap>
     <md-card>
@@ -145,7 +134,7 @@
           <tbody id="tableBody">
 
             <tr ng-repeat="dimension in measure.measurements track by $index" class="tableBodyRow" >
-              <td id="row{{measure.measurements[$index].id}}" ng-show="measure.measurements[$index].edit" >{{dimension.floor}}</td>
+              <td ng-show="measure.measurements[$index].edit" id="row{{measure.measurements[$index].id}}">{{dimension.floor}}</td>
               <td ng-hide="measure.measurements[$index].edit" class="inputTd"><md-input-container><input ng-model="measure.measurements[$index].floor" size="6"  aria-label="floor"></md-input-container></td>
               <td ng-show="measure.measurements[$index].edit">{{dimension.room}}</td>
               <td ng-hide="measure.measurements[$index].edit" class="inputTd"><md-input-container>
@@ -179,13 +168,15 @@
                 <input ng-enter="measure.updateRowButton($index)" ng-model="measure.measurements[$index].fascia_size" size="6"  aria-label="fascia_size"></md-input-container></td>
 
               <td ng-show="measure.measurements[$index].edit">{{dimension.fabric}}</td>
-              <td ng-hide="measure.measurements[$index].edit" class="inputTd"><md-input-container><input ng-enter="measure.updateRowButton($index)" ng-model="measure.measurements[$index].fabric" size="20"  aria-label="fabric"></md-input-container></td>
+              <td ng-hide="measure.measurements[$index].edit" class="inputTd"><md-input-container>
+                <input ng-enter="measure.updateRowButton($index)" ng-model="measure.measurements[$index].fabric" size="10"  aria-label="fabric"></md-input-container></td>
 
               <td ng-show="measure.measurements[$index].edit">{{dimension.mount}}</td>
               <td ng-hide="measure.measurements[$index].edit" class="inputTd"><md-input-container>
-                <input ng-enter="measure.updateRowButton($index)" ng-model="measure.measurements[$index].mount" size="10"  aria-label="mount"></md-input-container></td>
+                <input ng-enter="measure.updateRowButton($index)" ng-model="measure.measurements[$index].mount" size="6"  aria-label="mount"></md-input-container></td>
 
               <td ng-show="measure.measurements[$index].edit" id="removeIconPadding">
+
                 <md-button ng-click="measure.measurements[$index].edit = !measure.measurements[$index].edit;" class="md-icon-button" aria-label="edit">
                   <md-icon md-svg-icon="./img/edit.svg"></md-icon>
                 </md-button>
@@ -259,7 +250,7 @@
 
           <md-input-container layout-align="start end" flex class="md-block" id="areaNotes">
             <label>Area Notes:</label>
-            <textarea value="measure.areaNotes" ng-model="measure.areaNotes" ></textarea>
+            <textarea value="measure.measurements[0].notes" ng-model="measure.measurements[0].notes" ></textarea>
           </md-input-container>
         </div>
 
