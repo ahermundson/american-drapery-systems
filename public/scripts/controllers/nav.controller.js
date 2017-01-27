@@ -44,17 +44,9 @@ function(UserFactory, $location, $scope) {
     $location.path('/admin');
   }
 
-  // $rootScope.$on('$routeChangeSuccess', function (next, last) {
-  //   console.log("Nav controller detected a change in Angular route");
-  //   getUser();
-  // });
-
   function getUser() {
     self.currentUser = UserFactory.getUser();
     self.isUser = UserFactory.userChecker();
-    console.log("nav controllers get user: ", self.currentUser, self.isUser);
   }
-
-
 
 }]);

@@ -10,7 +10,6 @@ app.controller('AdminController', ['UserFactory', '$http', "$mdDialog", "$timeou
     // firebaseUser will be null if not logged in
     currentUser = firebaseUser;
     getUsers();
-    console.log("onAuthStateChanged", currentUser);
   });
 
   function getUsers() {
@@ -24,7 +23,6 @@ app.controller('AdminController', ['UserFactory', '$http', "$mdDialog", "$timeou
           id_token: idToken
         }
       }).then(function(response){
-        console.log('success');
         self.users = response.data;
         self.loading = true;
       });
@@ -39,7 +37,6 @@ app.controller('AdminController', ['UserFactory', '$http', "$mdDialog", "$timeou
       newUser.can_edit_users = false;
     }
     currentUser = UserFactory.getUser();
-    console.log('adding user - newuser:', newUser);
     currentUser.getToken().then(function(idToken) {
       $http({
         method: 'POST',
@@ -72,18 +69,12 @@ app.controller('AdminController', ['UserFactory', '$http', "$mdDialog", "$timeou
           id_token: idToken
         }
       }).then(function(response){
-        console.log('delete success - id');
-
       removeObjById(self.users, id);
       self.redId = false;
-      console.log('self.users', self.users);
       }).catch(function(err) {
-
-        console.log("Error in user post: ", err);
         if (err.status === 403) {
           self.unauthorized = true;
           notAuthorizedAlert();
-          console.log("In error 403: ", self.unauthorized);
         }
       });
     });
@@ -119,7 +110,6 @@ app.controller('AdminController', ['UserFactory', '$http', "$mdDialog", "$timeou
         textContent: 'You are not authorized to perform this action',
         ok: 'Close'
       });
-
       $mdDialog
         .show( alert )
         .finally(function() {
@@ -127,5 +117,4 @@ app.controller('AdminController', ['UserFactory', '$http', "$mdDialog", "$timeou
           alert = undefined;
         });
     }
-
 }]);

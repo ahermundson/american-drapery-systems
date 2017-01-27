@@ -15,8 +15,18 @@ function($http, UserFactory, $mdDialog, $route, $location, $anchorScroll, $timeo
   self.currentProfile = {};
   var currentUser;
 
+  //Runs when page refreshed AND when switching to this controller
+  UserFactory.auth.$onAuthStateChanged(function(firebaseUser) {
+    if(firebaseUser) {
+      currentUser = firebaseUser;
+      getMeasurements(firebaseUser);
+      getAreaInfo(firebaseUser);
+    } else {
+      console.log("There is no firebase user in measurement controller");
+    }
+  });
+
   function getMeasurements(firebaseUser) {
-    console.log("CurrentUser in getmeasure: ", currentUser);
     currentUser = firebaseUser;
     currentUser.getToken()
       .then(function(idToken) {
@@ -29,29 +39,12 @@ function($http, UserFactory, $mdDialog, $route, $location, $anchorScroll, $timeo
         }).then(function(response) {
           console.log("response in measurement controller: ", response);
           self.measurements = response.data;
-          for (var i = 0; i < self.measurements.length; i++) {
-            self.measurements[i].edit = true;
-          }
-          self.loading = true;
-          console.log(self.measurements);
-          // self.area_name = self.measurements[0].area_name;
-          console.log('AREA NAME', self.area_name);
+          initMeas();
         }).catch(function(err) {
           console.log("Error in measurment controller get req: ", err);
         });
       })
   }
-
-  //Runs when page refreshed AND when switching to this controller
-  UserFactory.auth.$onAuthStateChanged(function(firebaseUser) {
-    if(firebaseUser) {
-      currentUser = firebaseUser;
-      getMeasurements(firebaseUser);
-      getAreaInfo(firebaseUser);
-    } else {
-      console.log("There is no firebase user in measurement controller");
-    }
-  });
 
   function getAreaInfo(firebaseUser) {
     currentUser = firebaseUser;
@@ -66,12 +59,7 @@ function($http, UserFactory, $mdDialog, $route, $location, $anchorScroll, $timeo
         })
         .then(function(response){
           self.companyInfo = response.data[0];
-          if (self.companyInfo.completion_date) {
-            self.completionDate = new Date(self.companyInfo.completion_date);
-          }
-          if (self.companyInfo.survey_date) {
-            self.surveyDate = new Date(self.companyInfo.survey_date);
-          }
+          initArea();
         },
         function(err) {
           console.log("error getting survey details: ", err);
@@ -79,48 +67,55 @@ function($http, UserFactory, $mdDialog, $route, $location, $anchorScroll, $timeo
     })
   }
 
+  function initMeas() {
+    for (var i = 0; i < self.measurements.length; i++) {
+      self.measurements[i].edit = true;
+    }
+    self.loading = true;
+  }
+
+  function initArea() {
+    if (self.companyInfo.completion_date) {
+      self.completionDate = new Date(self.companyInfo.completion_date);
+    }
+    if (self.companyInfo.survey_date) {
+      self.surveyDate = new Date(self.companyInfo.survey_date);
+    }
+  }
 
   self.addButton = function(){
-    console.log("mesurement: ", self.measurement);
-    console.log("survey ID: ", self.areaId);
     self.deleteColor = 0;
     var currentUser = UserFactory.getUser();
-    console.log("Current User at addButton: ", currentUser);
     currentUser.getToken()
     .then(function(idToken) {
-        $http({
-          method: 'POST',
-          url: '/measurements/' + self.areaId,
-          data: self.measurement,
-          headers: {
-            id_token: idToken
-          }
-        }).then(function(response) {
-          console.log("Response from measurement route: ", response);
-          newId = response.data[0].id
-          self.measurement.id = newId;
-          self.addColor = newId;
-          console.log(self.addColor, self.deleteColor);
-          self.measurements.push(angular.copy(self.measurement));
+      $http({
+        method: 'POST',
+        url: '/measurements/' + self.areaId,
+        data: self.measurement,
+        headers: {
+          id_token: idToken
+        }
+      }).then(function(response) {
+        addOps(response.data[0].id);
+      }).catch(function(err) {
+        console.log("Error in measurement post");
+        if (err.status === 403) {
+          notAuthorizedAlert();
+        }
+      });
+    })
+  }
 
-          $timeout(function(){
-            self.addColor = 0;
-          }, 700);
-        }).catch(function(err) {
-          console.log("Error in measurement post");
-          if (err.status === 403) {
-            notAuthorizedAlert();
-            console.log("In error 403");
-          }
-        });
-      })
-    console.log("mesurement array", self.measurements);
-    console.log("mesurement object", self.measurement);
-
+  function addOps(newId) {
+    self.measurement.id = newId;
+    self.addColor = newId;
+    self.measurements.push(angular.copy(self.measurement));
+    $timeout(function(){
+      self.addColor = 0;
+    }, 700);
   }
 
   function updateNotes(){
-    console.log("Notes");
     currentUser.getToken()
       .then(function(idToken) {
         $http({
@@ -130,14 +125,11 @@ function($http, UserFactory, $mdDialog, $route, $location, $anchorScroll, $timeo
           headers: {
             id_token: idToken
           }
-        }).then(function(response){
-          console.log("Updated: ", response.data);
-        },
+        }).then(function(response){},
         function(err) {
           console.log("error updating survey details: ", err);
           if (err.status === 403) {
             notAuthorizedAlert();
-            console.log("In error 403");
           }
         });
     });
@@ -145,9 +137,8 @@ function($http, UserFactory, $mdDialog, $route, $location, $anchorScroll, $timeo
 
   //button clicked to update the edited row
   self.updateRowButton = function(index){
-    console.log("check clicked", index);
+
     self.measurements[index].edit = !self.measurements[index].edit;
-    console.log("measurements", self.measurements[index]);
     var currentUser = UserFactory.getUser();
     currentUser.getToken()
       .then(function(idToken) {
@@ -159,14 +150,12 @@ function($http, UserFactory, $mdDialog, $route, $location, $anchorScroll, $timeo
               id_token: idToken
             }
           }).then(function(response) {
-            console.log("Response from measurement route: ", response);
           }).catch(function(err) {
             console.log("Error in measurement update");
             //replace with previous values
             getMeasurements();
             if (err.status === 403) {
               notAuthorizedAlert();
-              console.log("In error 403");
             }
           });
       });
@@ -175,8 +164,6 @@ function($http, UserFactory, $mdDialog, $route, $location, $anchorScroll, $timeo
   //Confirming user wants to delete measurement. Index is the measurement to delete
   self.showConfirm = function(ev, index, id) {
     // Appending dialog to document.body to cover sidenav in docs app
-    console.log("delete id:", id);
-
     self.deleteColor = id;
     var confirm = $mdDialog.confirm()
       .title('Are you sure you wish to delete this measurement?')
@@ -194,55 +181,50 @@ function($http, UserFactory, $mdDialog, $route, $location, $anchorScroll, $timeo
     currentUser = UserFactory.getUser();
     currentUser.getToken()
     .then(function(idToken) {
-        $http({
-          method: 'DELETE',
-          url: '/measurements/' + self.measurements[index].id,
-          headers: {
-            id_token: idToken
-          }
-        }).then(function(response) {
-          console.log("Response from measurement route: ", response);
-          self.measurements.splice(index, 1);
-          self.deleteColor = 0;
-          self.deleteId = null;
-        }).catch(function(err) {
-          console.log("Error in measurement post");
-          if (err.status === 403) {
-            notAuthorizedAlert();
-            console.log("In error 403");
-          }
-        });
+      $http({
+        method: 'DELETE',
+        url: '/measurements/' + self.measurements[index].id,
+        headers: {
+          id_token: idToken
+        }
+      }).then(function(response) {
+        self.measurements.splice(index, 1);
+        self.deleteColor = 0;
+        self.deleteId = null;
+      }).catch(function(err) {
+        console.log("Error in measurement post");
+        if (err.status === 403) {
+          notAuthorizedAlert();
+        }
       });
+    });
   }
 
   self.backToArea = function() {
     updateNotes();
     $location.path('/area/' + surveyId);
-    console.log("self.measurements", self.measurements);
   }
 
   self.goToTopOfPage = function(){
-    console.log("clicked");
-    window.scrollTo(0,0)
+    window.scrollTo(0,0);
   }
 
   function notAuthorizedAlert() {
-      alert = $mdDialog.alert({
-        title: 'Attention',
-        textContent: 'You are not authorized to perform this action',
-        ok: 'Close'
-      });
+    alert = $mdDialog.alert({
+      title: 'Attention',
+      textContent: 'You are not authorized to perform this action',
+      ok: 'Close'
+    });
 
-      $mdDialog
-        .show( alert )
-        .finally(function() {
-          self.deleteColor = 0;
-          self.deleteId = null;
-          alert = undefined;
-          console.log("Ran .finally");
-          getMeasurements(currentUser);
-          self.measurement = {};
-        });
-    }
+    $mdDialog
+      .show( alert )
+      .finally(function() {
+        self.deleteColor = 0;
+        self.deleteId = null;
+        alert = undefined;
+        getMeasurements(currentUser);
+        self.measurement = {};
+      });
+  }
 
 }]);

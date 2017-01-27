@@ -1,5 +1,4 @@
 app.controller('LoginController', ['UserFactory', '$location', function(UserFactory, $location, TestFactory) {
-  console.log("LoginController is running");
 
   const self = this;
 
@@ -14,5 +13,4 @@ app.controller('LoginController', ['UserFactory', '$location', function(UserFact
       UserFactory.logOut()
     })
   };
-
 }]);

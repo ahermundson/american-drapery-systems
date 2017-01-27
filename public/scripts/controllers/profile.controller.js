@@ -18,14 +18,12 @@ app.controller('ProfileController', ["$http", "UserFactory", "IdFactory", "$loca
   //Submit button function
   self.submitButton = function(client){
     copyAddress(client);
-    console.log("submit button clicked. Object:", client);
     postClients(client);
   }
 
   //Update existing client information Button
   self.updateButton = function(client){
     copyAddress(client);
-    console.log("update button clicked. Object:", client);
     updateClient(client);
   }
 
@@ -33,7 +31,6 @@ app.controller('ProfileController', ["$http", "UserFactory", "IdFactory", "$loca
   //GET client_name and id for Dropdown
   function getClients() {
     // currentUser = UserFactory.getUser();
-    console.log("current user: ", currentUser);
     currentUser.getToken().then(function(idToken) {
       $http({
         method: 'GET',
@@ -42,7 +39,6 @@ app.controller('ProfileController', ["$http", "UserFactory", "IdFactory", "$loca
           id_token: idToken
         }
       }).then(function(response){
-        console.log('success. Response', response.data);
         self.clients = response.data
       });
     });
@@ -51,8 +47,6 @@ app.controller('ProfileController', ["$http", "UserFactory", "IdFactory", "$loca
   //POST client information to database
   function postClients(client) {
     // currentUser = UserFactory.getUser();
-    console.log(client);
-    console.log("current user: ", currentUser);
     currentUser.getToken().then(function(idToken) {
       $http({
         method: 'POST',
@@ -62,9 +56,7 @@ app.controller('ProfileController', ["$http", "UserFactory", "IdFactory", "$loca
           id_token: idToken
         }
       }).then(function(response){
-        console.log('success in adding new client');
         var clientId = response.data[0].id;
-        console.log(response.data[0].id);
         self.survey.client_id = clientId;
         addNewSurvey(self.survey);
       },
@@ -81,8 +73,6 @@ app.controller('ProfileController', ["$http", "UserFactory", "IdFactory", "$loca
   //Update client information in database
   function updateClient(client) {
     // currentUser = UserFactory.getUser();
-    console.log("current user: ", currentUser);
-    console.log('client', client);
     currentUser.getToken().then(function(idToken) {
       $http({
         method: 'POST',
@@ -92,7 +82,6 @@ app.controller('ProfileController', ["$http", "UserFactory", "IdFactory", "$loca
           id_token: idToken
         }
       }).then(function(response){
-        console.log('success');
         addNewSurvey(self.survey);
       },
       function(err) {
@@ -108,13 +97,11 @@ app.controller('ProfileController', ["$http", "UserFactory", "IdFactory", "$loca
   //course of action from drop down selection
   self.dropdownOption = function(client){
     self.survey.status = 'Pending';
-    console.log("selected", client);
     if (client === "None") {
       self.clients = {};
       self.showCompany = false;
       self.showUpdateButton = true;
       self.showSubmitButton = false;
-      console.log("This if statement works");
     } else {
       self.survey.client_id = client.id;
       self.showUpdateButton = false;
@@ -125,7 +112,6 @@ app.controller('ProfileController', ["$http", "UserFactory", "IdFactory", "$loca
 
 
   function addNewSurvey(survey) {
-    console.log("Running addNewSurvey");
     currentUser.getToken().then(function(idToken) {
       $http({
         method: 'POST',
@@ -136,7 +122,6 @@ app.controller('ProfileController', ["$http", "UserFactory", "IdFactory", "$loca
         }
       }).then(function(response){
         $location.path('/area/' + response.data[0].id);
-        console.log('success in adding new survey');
       },
       function(err) {
         console.log("error creading survey: ", err);

@@ -63,9 +63,6 @@ function(FileFactory, UserFactory, IdFactory, $route, $mdDialog, $scope, $mdToas
   };
 
   self.submitFiles = function() {
-    console.log('submit files clicked');
-    console.log('sending these files to FileFactory: ', self.newFilesObject.files);
-    console.log('sending this file info to FileFactory: ', self.newFilesObject.filesInfo);
     FileFactory.updateFiles(self.newFilesObject); //send newFilesObject to FileFactory
     FileFactory.submitFiles(currentUser, surveyId, areaId)
     .then(function() {
@@ -78,7 +75,6 @@ function(FileFactory, UserFactory, IdFactory, $route, $mdDialog, $scope, $mdToas
           };
           console.log(self.newFilesObject);
           $scope.$apply();
-          angular.element(document).find('#yourFile').val('');
         })
     }); //send files and info to server
   };
@@ -94,20 +90,16 @@ function(FileFactory, UserFactory, IdFactory, $route, $mdDialog, $scope, $mdToas
             id_token: idToken
           }
         }).then(function(response) {
-          console.log("Successfully deleted file from DB: ", response);
           FileFactory.currentFilesObject = {}; //clear fileFactory
           FileFactory.getFiles(currentUser, areaId)
             .then(function() {
-              console.log("Did this happen at the right time?");
               self.currentFilesObject = FileFactory.currentFilesObject;
-              console.log("current files after delete", self.currentFilesObject);
               $scope.$apply();
         }).catch(function(err) {
           console.log("Server error deleting files: ", err);
           FileFactory.getFiles(currentUser, areaId)
             .then(function() {
               self.currentFilesObject = FileFactory.currentFilesObject;
-              console.log(self.currentFilesObject);
             })
           })
         })

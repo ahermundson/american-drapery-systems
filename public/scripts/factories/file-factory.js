@@ -16,11 +16,9 @@ function($http, MultipartForm) {
     updateFiles: function(newFiles) {
       fileFactory.newFilesObject.files = newFiles.files;
       fileFactory.newFilesObject.filesInfo = newFiles.filesInfo;
-      console.log("Files now in FileFactory: ", fileFactory.newFilesObject.files, fileFactory.newFilesObject.filesInfo);
     },
 
     getFiles: function(currentUser, areaId) {
-      console.log("current user in get files: ", currentUser);
       return currentUser.getToken().then(function(idToken) {
         return $http({
           method: 'GET',
@@ -30,7 +28,6 @@ function($http, MultipartForm) {
           }
         }).then(function(response) {
           // return console.log("Recieved this info from the server in FileFactory GET req: ", response);\
-          console.log("RESPONSE IN FILE FACTORY: ", response);
           for (var i = 0; i < response.data.length; i++) {
             let currentFile = response.data[i];
             //create file property(subobject):
@@ -44,7 +41,6 @@ function($http, MultipartForm) {
             fileFactory.currentFilesObject["file_" + (i + 1)].originalName = currentFile.original_name;
             fileFactory.currentFilesObject["file_" + (i + 1)].extension = currentFile.original_name.slice((Math.max(0, currentFile.original_name.lastIndexOf(".")) || Infinity) + 1);
           }
-          console.log("CURRENT FILES OBJECT: ", fileFactory.currentFilesObject);
           return fileFactory.currentFilesObject;
         })
       })
@@ -61,7 +57,6 @@ function($http, MultipartForm) {
           }
         }).then(function(response) {
           // return console.log("Recieved this info from the server in FileFactory GET req: ", response);\
-          console.log("RESPONSE IN FILE FACTORY: ", response);
           for (var i = 0; i < response.data.length; i++) {
             let currentFile = response.data[i];
             //create file property(subobject):
@@ -80,7 +75,6 @@ function($http, MultipartForm) {
               fileFactory.currentFilesObject["file_" + (i + 1)].print = true;
             }
           }
-          console.log("CURRENT FILES OBJECT: ", fileFactory.currentFilesObject);
           return fileFactory.currentFilesObject;
         })
       })
@@ -88,12 +82,6 @@ function($http, MultipartForm) {
 
     submitFiles: function(currentUser, surveyId, areaId) {
       var uploadUrl = '/files/' + areaId;
-      console.log("submitFiles() running in FileFactory, sending files to server " +
-      "Using route: ", uploadUrl);
-
-      // fileExtensions(fileFactory.newFilesObject.files);
-
-
       return currentUser.getToken().then(function(idToken) {
         return MultipartForm.post(uploadUrl, surveyId, fileFactory.newFilesObject, idToken)
         .then(function(response) {
@@ -101,17 +89,6 @@ function($http, MultipartForm) {
         });
       });
     }
-
   }
-
   return fileFactory;
 }]);
-
-  // IF WE NEED TO GET FILE EXTENSIONS, INSTEAD OF JUST NAMES:
-  function fileExtensions(files) {
-    for(let i = 0; i < files.length; i++) {
-      let name = files[i].name;
-      let extension =  name.slice((Math.max(0, name.lastIndexOf(".")) || Infinity) + 1);
-      console.log("TEST FILE EXTENSION: \n\n\n\n", extension);
-    }
-  }

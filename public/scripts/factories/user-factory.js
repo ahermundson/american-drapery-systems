@@ -3,7 +3,6 @@ Create UserFactory
 *******************/
 app.factory('UserFactory', ['$firebaseAuth', "$http",
 function($firebaseAuth, $http) {
-  console.log("User Factory is running!");
   //Auth is constant (won't change), assign to $firebaseAuth()
   const auth = $firebaseAuth();
   //Instantiate currentUser object
@@ -16,7 +15,6 @@ function($firebaseAuth, $http) {
       //Assign result of signin to current user object
       currentUser = firebaseUser;
       //Log user's email
-      console.log("Firebase User: ", firebaseUser.user.email);
       //Get idToken
       return currentUser.user.getToken().then(function(idToken) {
         //GET request to /dashboard route, send idToken in header
@@ -27,7 +25,6 @@ function($firebaseAuth, $http) {
             id_token: idToken
           }
         }).then(function(response) { //when $http promise resolved:
-          console.log("Retrieved this data from server at login: ", response);
           isUser = true;
           return response;
         }).catch(function(err) { //If theres an err status code
@@ -57,7 +54,6 @@ function($firebaseAuth, $http) {
   //Lougout fxn, runs when logout btn is clicked
   ***********************************************/
   function logOut() {
-    console.log("Running logOut fxn in user-factory");
     //Firebase sign out method
      return auth.$signOut().then(function() {
       console.log("User succesfully logged out");

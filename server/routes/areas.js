@@ -5,7 +5,6 @@ var pg = require('pg');
 
 var pool = new pg.Pool(config);
 router.get('/:area_id', function(req, res) {
-  console.log('reached get one area route')
   console.log('area id',req.params.area_id);
   var area_id = req.params.area_id;
   pool.connect()
@@ -28,9 +27,7 @@ router.get('/:area_id', function(req, res) {
     });
 });
 router.post('/', function(req,res) {
-  console.log(req.body);
   var newArea = req.body;
-  console.log("NewArea: ", newArea);
   if (req.authorized === false) {
     res.sendStatus(403);
   } else {

@@ -1,6 +1,5 @@
 app.controller('SurveyController', ["$http", 'UserFactory', 'IdFactory', '$route', 'FileFactory', '$scope', '$mdDialog',
 function($http, UserFactory, IdFactory, $route, FileFactory, $scope, $mdDialog) {
-  console.log("In Survey Controller");
   var self = this;
   var surveyId = $route.current.params.surveyId;
   self.surveyId = surveyId;
@@ -9,10 +8,8 @@ function($http, UserFactory, IdFactory, $route, FileFactory, $scope, $mdDialog) 
   self.imgLoad = false;
   const MIN_AREA_GOTO_TOP = 3;
   var currentFilesObject = {};
-
   self.goToTop = function() {
     window.scrollTo(0, 0);
-    console.log("Clicked Top");
   };
 
   self.show = true;
@@ -49,7 +46,6 @@ function($http, UserFactory, IdFactory, $route, FileFactory, $scope, $mdDialog) 
   };
 
 
-  console.log("surveyId: ", surveyId);
 
   function getSurveyDetails() {
     // currentUser = UserFactory.getUser();
@@ -65,24 +61,19 @@ function($http, UserFactory, IdFactory, $route, FileFactory, $scope, $mdDialog) 
         })
         .then(function(response){
           self.surveyDetails = formatDates(response.data);
-          console.log("Response From Server: ", self.surveyDetails);
           //Seperate measurements into areas
           var separateAreas = groupBy(self.surveyDetails, 'area_name');
-          console.log(separateAreas);
           self.areaArray = [];
           self.loading = true;
           for (x in separateAreas) {
             self.areaArray.push(separateAreas[x]);
           }
-          console.log("areaArray: ", self.areaArray);
         })
         .then(function() {
           FileFactory.getSurveyFiles(currentUser, surveyId)
             .then(function() {
-              console.log("This .then() is happening");
               self.currentFilesObject = FileFactory.currentFilesObject;
               FileFactory.currentFilesObject = {}; //Clearfile Factory
-              console.log("currentFilesObject: ", self.currentFilesObject);
               self.imgLoad = true;
               $scope.$apply();
             })

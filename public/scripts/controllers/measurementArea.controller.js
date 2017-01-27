@@ -12,17 +12,14 @@ function($http, $location, UserFactory, $route, $mdDialog, $timeout) {
   var surveyHasAreas = true;
   self.newAreaName = '';
   self.editAreas = false;
-  console.log(surveyId);
+
   self.inputAreaName = false;
   self.toRemove = [];
   self.loggedOut = false;
 
   //function to send area to measurent controller
   self.setArea = function(index) {
-    console.log("index: ", index);
     areaId = self.areaArrayId[index];
-    console.log("self.areaArrayId: ", self.areaArrayId);
-    console.log("setArea() areaId: ", areaId);
     selectedAreaName = self.areaArray[index];
 
     $location.path('/measurement/' + surveyId + '/' + areaId + '/' + selectedAreaName);
@@ -65,7 +62,6 @@ function($http, $location, UserFactory, $route, $mdDialog, $timeout) {
         deleteIds.push(self.areaArrayId[i])
       }
     }
-    console.log('deleteIds', deleteIds);
     currentUser.getToken()
       .then(function(idToken) {
         $http({
@@ -102,15 +98,12 @@ function($http, $location, UserFactory, $route, $mdDialog, $timeout) {
       })
     } else {
       self.loading = false;
-      console.log("Clicked Add New Area:");
       self.inputAreaName = false;
       self.newArea = {
         area_name: self.newAreaName,
         survey_id: surveyId,
         notes: ""
       }
-      console.log("New Area Object: ", self.newArea);
-      // currentUser = UserFactory.getUser();
 
       currentUser.getToken()
         .then(function(idToken) {
@@ -124,7 +117,6 @@ function($http, $location, UserFactory, $route, $mdDialog, $timeout) {
           }).then(function(response){
             console.log("Response from new area post: ", response.data[0].id);
             areaId = response.data[0].id;
-            console.log("In response");
             $location.path('/measurement/' + surveyId + '/' + areaId + '/' + self.newAreaName);
           },
           function(err) {
@@ -140,13 +132,11 @@ function($http, $location, UserFactory, $route, $mdDialog, $timeout) {
 
   //Edit client profile button
   self.editClient = function(){
-    console.log("clicked");
     self.showInput = !self.showInput;
   }
   //save edits to client profile button
   self.updateClient = function(){
     var clientId = self.companyInfo.client_id;
-    console.log("Update client clicked, clientId: ", clientId, self.companyInfo);
     currentUser.getToken()
     .then(function(idToken) {
       $http({
@@ -157,7 +147,6 @@ function($http, $location, UserFactory, $route, $mdDialog, $timeout) {
           id_token: idToken
         }
       }).then(function(response){
-        console.log("Response from new area post: ", response.data);
         self.showInput = !self.showInput;
       },
       function(err) {
@@ -179,7 +168,6 @@ function($http, $location, UserFactory, $route, $mdDialog, $timeout) {
           id_token: idToken
         }
       }).then(function(response){
-        console.log("Response from new area post: ", response.data);
       },
       function(err) {
         console.log("error updating clientdetails: ", err);
@@ -237,8 +225,6 @@ function($http, $location, UserFactory, $route, $mdDialog, $timeout) {
   }
 
   function surveyOps() {
-    console.log("surveyOps Running");
-    console.log('surveydetails', self.surveyDetails);
 
     self.companyInfo = self.surveyDetails[0];
     if(surveyHasAreas) {
@@ -259,9 +245,6 @@ function($http, $location, UserFactory, $route, $mdDialog, $timeout) {
     }
     self.editAreas = false;
     self.loading = true;
-    console.log("Response From Server: ", self.surveyDetails);
-    console.log("Area Array: ", self.areaArray);
-    console.log("Area ID: ", self.areaArrayId);
     surveyHasAreas = true;
   }
   // getSurveyDetails(firebaseUser);
@@ -280,7 +263,6 @@ function($http, $location, UserFactory, $route, $mdDialog, $timeout) {
   });
 
   self.survey = function() {
-    console.log("surveyId in ma.survey: ", surveyId);
     self.loading = true;
     $location.path('/survey/' + surveyId);
   }

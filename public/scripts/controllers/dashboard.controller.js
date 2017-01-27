@@ -30,7 +30,6 @@ app.controller('DashboardController', ['UserFactory', 'IdFactory', '$http', '$lo
           id_token: idToken
         }
       }).then(function(response){
-        console.log('success');
         self.filtered = formatDates(response.data);
         self.loading = true;
       });
@@ -39,7 +38,6 @@ app.controller('DashboardController', ['UserFactory', 'IdFactory', '$http', '$lo
 
   self.showConfirm = function(ev, id) {
     self.redId=id;
-    console.log('red id', id);
     // Appending dialog to document.body to cover sidenav in docs app
     var confirm = $mdDialog.confirm()
       .title('Are you sure you wish to delete survey #' + id + ', along with all associated areas, measurements and files?')
@@ -54,7 +52,6 @@ app.controller('DashboardController', ['UserFactory', 'IdFactory', '$http', '$lo
   };
 
   function deleteSurvey(id) {
-    console.log("remove survey ", id);
     currentUser = UserFactory.getUser();
     currentUser.getToken()
     .then(function(idToken) {
@@ -65,7 +62,6 @@ app.controller('DashboardController', ['UserFactory', 'IdFactory', '$http', '$lo
             id_token: idToken
           }
         }).then(function(response) {
-          console.log("Response from survey route: ", response);
           self.redId=0;
           removeObjById(self.filtered, id);
         }).catch(function(err) {
@@ -83,7 +79,6 @@ app.controller('DashboardController', ['UserFactory', 'IdFactory', '$http', '$lo
   }
   self.survey = function(surveyId) {
     IdFactory.setSurvey(surveyId);
-    console.log("\n\nsurveyId in dash.survey: ", surveyId);
     $location.path('/survey/' + surveyId);
   }
   self.area = function(surveyId) {
@@ -92,7 +87,6 @@ app.controller('DashboardController', ['UserFactory', 'IdFactory', '$http', '$lo
   }
 
   self.changeStatus = function(survey_id, status) {
-    console.log("Select Changed - Survey Id is: ", survey_id);
     self.statusUpdate = {
       status: status,
       last_modified: new Date()
@@ -108,7 +102,6 @@ app.controller('DashboardController', ['UserFactory', 'IdFactory', '$http', '$lo
           id_token: idToken
         }
       }).then(function(response){
-        console.log("Response from status update: ", response);
         greenTimout(survey_id);
       },
       function(err) {
@@ -123,7 +116,6 @@ app.controller('DashboardController', ['UserFactory', 'IdFactory', '$http', '$lo
 
   function greenTimout(id) {
     self.greenId = id;
-    console.log('green id', id);
     $timeout(function(){
       self.greenId = 0;
     }, 1000);
