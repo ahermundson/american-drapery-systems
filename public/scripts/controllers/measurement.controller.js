@@ -75,6 +75,7 @@ function($http, UserFactory, $mdDialog, $route, $location, $anchorScroll, $timeo
   }
 
   function initArea() {
+    self.areaNotes = self.companyInfo.notes;
     if (self.companyInfo.completion_date) {
       self.completionDate = new Date(self.companyInfo.completion_date);
     }
