@@ -13,8 +13,6 @@ aws.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY
 });
 
-console.log("KEYS: ", process.env.AWS_SECRET_ACCESS_KEY);
-
 /**********************************************
                 GLOBAL STORAGE
 ***********************************************/
@@ -29,7 +27,7 @@ var bucket = 'american-drapery-systems';
 var keys = {}; //storing AWS.S3 file keys here
 var fileNames = {};
 var fileInfo = {};
-var s3 = new aws.S3();
+var s3 = new aws.S3({signatureVersion: 'v4'});
 var pool = new pg.Pool(config);
 /**********************************************
                  AMAZON UPLOAD
