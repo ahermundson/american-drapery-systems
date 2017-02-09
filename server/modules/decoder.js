@@ -16,9 +16,9 @@ admin.initializeApp({
 });
 
 var tokenDecoder = function(req, res, next){
-  console.log("token decoder runnning. Headers: ", req.headers);
+  // console.log("token decoder runnning. Headers: ", req.headers);
   if (req.headers.id_token) {
-    console.log("There's and id token on the request: ", req.headers.id_token);
+    // console.log("There's and id token on the request: ", req.headers.id_token);
     admin.auth().verifyIdToken(req.headers.id_token).then(function(decodedToken) {
       req.decodedToken = decodedToken;
       next();
